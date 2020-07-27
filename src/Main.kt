@@ -76,4 +76,12 @@ fun main() {
 
     val message4 = Lazy.lift(consMessage)(greetings)(name1)
     println(if (condition) message4() else defaultMessage())
+
+    // ---------------------
+    println()
+
+    val greets: (String) -> String = { "Hello, $it" }
+    val msg = name1.map(greets)
+    println(if (condition) msg() else defaultMessage())
+    println(if (condition) msg() else defaultMessage())
 }
