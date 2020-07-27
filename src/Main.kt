@@ -1,5 +1,6 @@
 import laziness.Lazy
 import java.lang.IllegalStateException
+import java.util.*
 import kotlin.random.Random
 
 fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
@@ -16,6 +17,11 @@ val constructMessage: (Lazy<String>) -> (Lazy<String>) -> Lazy<String> =
 
 val consMessage: (String) -> (String) -> String = { greetings ->
     { name -> "$greetings $name!" }
+}
+
+fun getGreetings(us: Locale?): String {
+    println("Evaluating greetings")
+    return "Hello"
 }
 
 fun main() {
@@ -84,4 +90,28 @@ fun main() {
     val msg = name1.map(greets)
     println(if (condition) msg() else defaultMessage())
     println(if (condition) msg() else defaultMessage())
+
+    // ---------------------
+    println()
+
+    val greetings2: Lazy<String> = Lazy { getGreetings(Locale.US) }
+    val flatGreets: (String) -> Lazy<String> = { name ->
+        println("okokokok")
+        greetings2.map { "$it, $name!" }
+    }
+
+    val name: Lazy<String> = Lazy {
+        println("computing name")
+        "why?"
+    }
+
+    val defaultMsg: Lazy<String> = Lazy {
+        println("Evaluating default msg")
+        "No greetings"
+    }
+
+    val message = name.flatMap(flatGreets)
+
+    println(if (condition) message() else defaultMsg())
+    println(if (condition) message() else defaultMsg())
 }

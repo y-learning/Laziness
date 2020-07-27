@@ -7,6 +7,8 @@ class Lazy<A>(function: () -> A) : () -> A {
 
     fun <B> map(f: (A) -> B): Lazy<B> = Lazy { f(memoizedValue) }
 
+    fun <B> flatMap(f: (A) -> Lazy<B>): Lazy<B> = Lazy { f(memoizedValue)() }
+
     companion object {
         fun <A, B, C> lift(f: (A) -> (B) -> C):
                 (Lazy<A>) -> (Lazy<B>) -> Lazy<C> = { a ->
