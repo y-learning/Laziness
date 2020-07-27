@@ -14,6 +14,10 @@ val constructMessage: (Lazy<String>) -> (Lazy<String>) -> Lazy<String> =
             }
         }
 
+val consMessage: (String) -> (String) -> String = { greetings ->
+    { name -> "$greetings $name!" }
+}
+
 fun main() {
     val first = Lazy {
         println("Evaluating first")
@@ -69,4 +73,7 @@ fun main() {
     val message3 = greetingHello(name3)
     println(if (condition) message3() else defaultMessage())
     println(if (condition) message3() else defaultMessage())
+
+    val message4 = Lazy.lift(consMessage)(greetings)(name1)
+    println(if (condition) message4() else defaultMessage())
 }
