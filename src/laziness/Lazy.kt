@@ -1,5 +1,7 @@
 package laziness
 
+import lists.List
+
 class Lazy<A>(function: () -> A) : () -> A {
     private val memoizedValue: A by lazy(function)
 
@@ -11,10 +13,13 @@ class Lazy<A>(function: () -> A) : () -> A {
 
     companion object {
         fun <A, B, C> lift(f: (A) -> (B) -> C):
-                (Lazy<A>) -> (Lazy<B>) -> Lazy<C> = { a ->
+            (Lazy<A>) -> (Lazy<B>) -> Lazy<C> = { a ->
             { b ->
                 Lazy { f(a())(b()) }
             }
         }
     }
 }
+
+fun <A> sequence(list: List<Lazy<A>>): Lazy<List<A>> =
+    Lazy { list.map { it() } }

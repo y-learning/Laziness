@@ -1,4 +1,5 @@
 import laziness.Lazy
+import lists.List
 import java.lang.IllegalStateException
 import java.util.*
 import kotlin.random.Random
@@ -6,14 +7,14 @@ import kotlin.random.Random
 fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
 
 fun constructMessage(greetings: Lazy<String>, name: Lazy<String>):
-        Lazy<String> = Lazy { "${greetings()} ${name()}!" }
+    Lazy<String> = Lazy { "${greetings()} ${name()}!" }
 
 val constructMessage: (Lazy<String>) -> (Lazy<String>) -> Lazy<String> =
-        { greetings ->
-            { name ->
-                Lazy { "${greetings()} ${name()}!" }
-            }
+    { greetings ->
+        { name ->
+            Lazy { "${greetings()} ${name()}!" }
         }
+    }
 
 val consMessage: (String) -> (String) -> String = { greetings ->
     { name -> "$greetings $name!" }
@@ -114,4 +115,26 @@ fun main() {
 
     println(if (condition) message() else defaultMsg())
     println(if (condition) message() else defaultMsg())
+
+    //----------------------------------------
+    println()
+    val n1: Lazy<String> = Lazy {
+        println("computing A")
+        "A"
+    }
+
+    val n2: Lazy<String> = Lazy {
+        println("computing B")
+        "B"
+    }
+
+    val n3: Lazy<String> = Lazy {
+        println("computing C")
+        "C"
+    }
+
+    val list = laziness.sequence(List(n1, n2, n3))
+
+    println(if (condition) list() else defaultMessage())
+    println(if (condition) list() else defaultMessage())
 }
