@@ -7,6 +7,13 @@ fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
 fun constructMessage(greetings: Lazy<String>, name: Lazy<String>):
         Lazy<String> = Lazy { "${greetings()} ${name()}!" }
 
+val constructMessage: (Lazy<String>) -> (Lazy<String>) -> Lazy<String> =
+        { greetings ->
+            { name ->
+                Lazy { "${greetings()} ${name()}!" }
+            }
+        }
+
 fun main() {
     val first = Lazy {
         println("Evaluating first")
@@ -40,6 +47,11 @@ fun main() {
         "Donald"
     }
 
+    val name3 = Lazy {
+        println("Evaluating name3")
+        "Minnie"
+    }
+
     val defaultMessage = Lazy {
         println("Evaluating default message")
         "No greetings when time is odd"
@@ -52,4 +64,9 @@ fun main() {
     println(if (condition) message1() else defaultMessage())
     println(if (condition) message1() else defaultMessage())
     println(if (condition) message2() else defaultMessage())
+
+    val greetingHello = constructMessage(greetings)
+    val message3 = greetingHello(name3)
+    println(if (condition) message3() else defaultMessage())
+    println(if (condition) message3() else defaultMessage())
 }
