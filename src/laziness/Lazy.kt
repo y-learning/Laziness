@@ -1,6 +1,10 @@
 package laziness
 
 import lists.List
+import lists.traverse
+import result.Result
+import result.map2
+import java.lang.RuntimeException
 
 class Lazy<A>(function: () -> A) : () -> A {
     private val memoizedValue: A by lazy(function)
@@ -23,3 +27,34 @@ class Lazy<A>(function: () -> A) : () -> A {
 
 fun <A> sequence(list: List<Lazy<A>>): Lazy<List<A>> =
     Lazy { list.map { it() } }
+
+fun <A> toResult(lazyA: Lazy<A>): Result<A> = try {
+    Result(lazyA())
+} catch (e: Exception) {
+    Result.failure(e)
+} catch (e: RuntimeException) {
+    Result.failure(e)
+}
+
+fun <A> sequenceResult1(list: List<Lazy<A>>): Lazy<Result<List<A>>> =
+    Lazy { lists.sequence(list.map { toResult(it) }) }
+
+fun <A> sequenceResult2(list: List<Lazy<A>>): Lazy<Result<List<A>>> =
+    Lazy { traverse(list) { toResult(it) } }
+
+fun <A> sequenceResult3(list: List<Lazy<A>>): Lazy<Result<List<A>>> {
+    val p = { acc: Result<List<A>> ->
+        acc.map { false }.getOrElse(true)
+    }
+    return Lazy {
+        list.foldLeft(Result(List()), p) { result: Result<List<A>> ->
+            { lazyA: Lazy<A> ->
+                map2(toResult(lazyA), result) { a: A ->
+                    { list: List<A> ->
+                        list.cons(a)
+                    }
+                }
+            }
+        }
+    }
+}

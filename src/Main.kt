@@ -1,7 +1,6 @@
 import laziness.Lazy
 import lists.List
 import java.lang.IllegalStateException
-import java.util.*
 import kotlin.random.Random
 
 fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
@@ -20,7 +19,7 @@ val consMessage: (String) -> (String) -> String = { greetings ->
     { name -> "$greetings $name!" }
 }
 
-fun getGreetings(us: Locale?): String {
+fun getGreetings(): String {
     println("Evaluating greetings")
     return "Hello"
 }
@@ -95,7 +94,7 @@ fun main() {
     // ---------------------
     println()
 
-    val greetings2: Lazy<String> = Lazy { getGreetings(Locale.US) }
+    val greetings2: Lazy<String> = Lazy { getGreetings() }
     val flatGreets: (String) -> Lazy<String> = { name ->
         println("okokokok")
         greetings2.map { "$it, $name!" }
@@ -137,4 +136,24 @@ fun main() {
 
     println(if (condition) list() else defaultMessage())
     println(if (condition) list() else defaultMessage())
+
+    //----------------------------------------
+    println()
+
+    val n4: Lazy<String> = Lazy {
+        println("computing C")
+        throw IllegalStateException("Exception while evaluating n4")
+    }
+    val n5: Lazy<String> = Lazy {
+        println("computing Z")
+        "Z"
+    }
+
+    val list1 = laziness.sequenceResult3(List(n1, n2, n3))
+    val list2 = laziness.sequenceResult3(List(n1, n2, n4, n3, n5))
+
+    println(if (condition) list1() else defaultMessage())
+    println(if (condition) list1() else defaultMessage())
+    println(if (condition) list2() else defaultMessage())
+    println(if (condition) list2() else defaultMessage())
 }
