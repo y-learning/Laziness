@@ -1,6 +1,5 @@
 import laziness.Lazy
 import lists.List
-import java.lang.IllegalStateException
 import kotlin.random.Random
 
 fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
@@ -152,8 +151,11 @@ fun main() {
     val list1 = laziness.sequenceResult3(List(n1, n2, n3))
     val list2 = laziness.sequenceResult3(List(n1, n2, n4, n3, n5))
 
-    println(if (condition) list1() else defaultMessage())
-    println(if (condition) list1() else defaultMessage())
-    println(if (condition) list2() else defaultMessage())
-    println(if (condition) list2() else defaultMessage())
+    val printMessage: (Any) -> Unit = ::println
+    val printDefault: () -> Unit = { println(defaultMessage()) }
+
+    list1.forEach(condition, printMessage, printDefault)
+    list1.forEach(condition, printMessage, printDefault)
+    list2.forEach(condition, printMessage, printDefault)
+    list2.forEach(condition, printMessage, printDefault)
 }

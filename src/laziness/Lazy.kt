@@ -15,6 +15,22 @@ class Lazy<A>(function: () -> A) : () -> A {
 
     fun <B> flatMap(f: (A) -> Lazy<B>): Lazy<B> = Lazy { f(memoizedValue)() }
 
+    fun forEach(condition: Boolean,
+                ifTrue: (A) -> Unit,
+                ifFalse: () -> Unit = {}) =
+        if (condition) ifTrue(memoizedValue)
+        else ifFalse()
+
+    fun forEach(condition: Boolean,
+                ifTrue: () -> Unit = {},
+                ifFalse: (A) -> Unit) =
+        if (condition) ifTrue()
+        else ifFalse(memoizedValue)
+
+    fun forEach(condition: Boolean, ifTrue: (A) -> Unit, ifFalse: (A) -> Unit) =
+        if (condition) ifTrue(memoizedValue)
+        else ifFalse(memoizedValue)
+
     companion object {
         fun <A, B, C> lift(f: (A) -> (B) -> C):
             (Lazy<A>) -> (Lazy<B>) -> Lazy<C> = { a ->
