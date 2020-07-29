@@ -1,4 +1,5 @@
 import laziness.Lazy
+import laziness.Stream
 import lists.List
 import kotlin.random.Random
 
@@ -158,4 +159,13 @@ fun main() {
     list1.forEach(condition, printMessage, printDefault)
     list2.forEach(condition, printMessage, printDefault)
     list2.forEach(condition, printMessage, printDefault)
+
+    val stream = Stream.from(1)
+    stream.first().forEach({ println(it) })
+    stream.rest()
+        .flatMap { seq -> seq.first() }
+        .forEach({ println(it) })
+    stream.rest()
+        .flatMap { seq -> seq.rest().flatMap { it.first() } }
+        .forEach({ println(it) })
 }
