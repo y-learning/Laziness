@@ -160,9 +160,18 @@ fun main() {
     list2.forEach(condition, printMessage, printDefault)
     list2.forEach(condition, printMessage, printDefault)
 
-    val stream = Stream.from(0).dropAtMost(60000).takeAtMost(60000)
+    val l = Stream.iterate(Lazy { 0 }, ::inc)
+        .takeAtMost(60000)
+        .dropAtMost(10000)
+        .takeAtMost(10)
+        .toList()
 
-    println(stream.toList())
+    println(l)
+}
+
+fun inc(i: Int): Int = (i + 1).let {
+    println("generating $it")
+    it
 }
 
 fun random(): Int {

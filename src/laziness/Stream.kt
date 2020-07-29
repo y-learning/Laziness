@@ -52,8 +52,6 @@ sealed class Stream<out T> {
         fun <T> cons(head: Lazy<T>, tail: Lazy<Stream<T>>): Stream<T> =
             Cons(head, tail)
 
-        fun from(i: Int): Stream<Int> = Cons(Lazy { i }, Lazy { from(i + 1) })
-
         tailrec fun <T> dropAtMost(n: Int, stream: Stream<T>): Stream<T> =
             if (stream is Cons && n > 0)
                 dropAtMost(n - 1, stream.tail())
@@ -68,5 +66,13 @@ sealed class Stream<out T> {
 
             return toList(stream, List()).reverse()
         }
+
+        fun <T> iterate(seed: T, f: (T) -> T): Stream<T> =
+            Cons(Lazy { seed }, Lazy { iterate(f(seed), f) })
+
+        fun <T> iterate(seed: Lazy<T>, f: (T) -> T): Stream<T> =
+            Cons(seed, Lazy { iterate(f(seed()), f) })
+
+        fun from(i: Int): Stream<Int> = iterate(i) { it + 1 }
     }
 }
