@@ -38,6 +38,9 @@ sealed class Stream<out T> {
             }
         }
 
+    fun firstSafe(): Result<T> =
+        foldRight(Lazy { Result<T>() }) { t: T -> { Result(t) } }
+
     private object Empty : Stream<Nothing>() {
         override fun first(): Result<Nothing> = Result()
 
