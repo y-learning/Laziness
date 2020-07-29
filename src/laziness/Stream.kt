@@ -10,6 +10,8 @@ sealed class Stream<out T> {
 
     abstract fun isEmpty(): Boolean
 
+    abstract fun takeAtMost(n: Int): Stream<T>
+
     fun <T> repeat(f: () -> T): Stream<T> =
         Cons(Lazy { f() }, Lazy { repeat(f) })
 
@@ -19,6 +21,8 @@ sealed class Stream<out T> {
         override fun rest(): Result<Nothing> = Result()
 
         override fun isEmpty(): Boolean = true
+
+        override fun takeAtMost(n: Int): Stream<Nothing> = this
     }
 
     private data class Cons<T>(val head: Lazy<T>,
@@ -29,6 +33,11 @@ sealed class Stream<out T> {
         override fun rest(): Result<Stream<T>> = Result(tail())
 
         override fun isEmpty(): Boolean = false
+
+        override fun takeAtMost(n: Int): Stream<T> = when {
+            n > 0 -> Cons(head, Lazy { tail().takeAtMost(n - 1) })
+            else -> Empty
+        }
     }
 
     companion object {
