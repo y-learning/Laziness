@@ -48,6 +48,14 @@ sealed class Stream<out T> {
         }
     }
 
+    fun filter(p: (T) -> Boolean): Stream<T> =
+        foldRight(Lazy<Stream<T>> { Empty }) { e: T ->
+            { acc: Lazy<Stream<T>> ->
+                if (p(e)) Cons(Lazy { e }, acc)
+                else acc()
+            }
+        }
+
     private object Empty : Stream<Nothing>() {
         override fun first(): Result<Nothing> = Result()
 
