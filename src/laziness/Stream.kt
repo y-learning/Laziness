@@ -10,6 +10,9 @@ sealed class Stream<out T> {
 
     abstract fun isEmpty(): Boolean
 
+    fun <T> repeat(f: () -> T): Stream<T> =
+        Cons(Lazy { f() }, Lazy { repeat(f) })
+
     private object Empty : Stream<Nothing>() {
         override fun first(): Result<Nothing> = Result()
 
