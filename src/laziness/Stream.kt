@@ -70,6 +70,8 @@ sealed class Stream<out T> {
             }
         }
 
+    fun find(p: (T) -> Boolean): Result<T> = filter(p).first()
+
     private object Empty : Stream<Nothing>() {
         override fun first(): Result<Nothing> = Result()
 
