@@ -63,6 +63,13 @@ sealed class Stream<out T> {
             }
         }
 
+    fun <U> flatMap(f: (T) -> Stream<U>): Stream<U> =
+        foldRight<Stream<U>>(Lazy { Empty }) { e: T ->
+            { acc: Lazy<Stream<U>> ->
+                f(e).append(acc)
+            }
+        }
+
     private object Empty : Stream<Nothing>() {
         override fun first(): Result<Nothing> = Result()
 
