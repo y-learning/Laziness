@@ -13,6 +13,8 @@ sealed class Stream<out T> {
 
     abstract fun takeAtMost(n: Int): Stream<T>
 
+    abstract fun takeWhile(p: (T) -> Boolean): Stream<T>
+
     fun dropAtMost(n: Int): Stream<T> = dropAtMost(n, this)
 
     fun <T> repeat(f: () -> T): Stream<T> =
@@ -28,6 +30,8 @@ sealed class Stream<out T> {
         override fun isEmpty(): Boolean = true
 
         override fun takeAtMost(n: Int): Stream<Nothing> = this
+
+        override fun takeWhile(p: (Nothing) -> Boolean): Stream<Nothing> = this
     }
 
     private data class Cons<T>(val head: Lazy<T>, val tail: Lazy<Stream<T>>)
@@ -41,6 +45,11 @@ sealed class Stream<out T> {
 
         override fun takeAtMost(n: Int): Stream<T> = when {
             n > 0 -> Cons(head, Lazy { tail().takeAtMost(n - 1) })
+            else -> Empty
+        }
+
+        override fun takeWhile(p: (T) -> Boolean): Stream<T> = when {
+            p(head()) -> Cons(head, Lazy { tail().takeWhile(p) })
             else -> Empty
         }
     }
