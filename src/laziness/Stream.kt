@@ -28,6 +28,16 @@ sealed class Stream<out T> {
 
     fun exists(p: (T) -> Boolean): Boolean = exists(this, p)
 
+    fun takeWhileViaFoldRight(p: (T) -> Boolean): Stream<T> =
+        foldRight(Lazy<Stream<T>> { Empty }) { item: T ->
+            { lStream: Lazy<Stream<T>> ->
+                if (p(item))
+                    Cons(Lazy { item }, lStream)
+                else
+                    lStream()
+            }
+        }
+
     private object Empty : Stream<Nothing>() {
         override fun first(): Result<Nothing> = Result()
 
