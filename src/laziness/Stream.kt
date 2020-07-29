@@ -144,8 +144,6 @@ sealed class Stream<out T> {
         fun <T> iterate(seed: Lazy<T>, f: (T) -> T): Stream<T> =
             Cons(seed, Lazy { iterate(f(seed()), f) })
 
-        fun from(i: Int): Stream<Int> = iterate(i) { it + 1 }
-
         tailrec fun <T> exists(stream: Stream<T>, p: (T) -> Boolean): Boolean =
             when (stream) {
                 Empty -> false
@@ -159,6 +157,10 @@ sealed class Stream<out T> {
             f(start).map { (s, t) ->
                 cons(Lazy { s }, Lazy { unfold(t, f) })
             }.getOrElse(Empty)
+
+        fun from(i: Int): Stream<Int> = unfold(i) { i ->
+            Result(Pair(i, i + 1))
+        }
     }
 }
 
