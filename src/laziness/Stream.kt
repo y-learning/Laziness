@@ -17,6 +17,8 @@ sealed class Stream<out T> {
 
     fun dropAtMost(n: Int): Stream<T> = dropAtMost(n, this)
 
+    fun dropWhile(p: (T) -> Boolean): Stream<T> = dropWhile(this, p)
+
     fun <T> repeat(f: () -> T): Stream<T> =
         Cons(Lazy { f() }, Lazy { repeat(f) })
 
@@ -64,6 +66,12 @@ sealed class Stream<out T> {
         tailrec fun <T> dropAtMost(n: Int, stream: Stream<T>): Stream<T> =
             if (stream is Cons && n > 0)
                 dropAtMost(n - 1, stream.tail())
+            else stream
+
+        tailrec fun <T> dropWhile(stream: Stream<T>,
+                                  p: (T) -> Boolean): Stream<T> =
+            if (stream is Cons && p(stream.head()))
+                dropWhile(stream.tail(), p)
             else stream
 
         fun <T> toList(stream: Stream<T>): List<T> {
