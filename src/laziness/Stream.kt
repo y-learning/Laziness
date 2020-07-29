@@ -154,6 +154,11 @@ sealed class Stream<out T> {
                     else -> exists(stream.tail(), p)
                 }
             }
+
+        fun <T, S> unfold(start: S, f: (S) -> Result<Pair<T, S>>): Stream<T> =
+            f(start).map { (s, t) ->
+                cons(Lazy { s }, Lazy { unfold(t, f) })
+            }.getOrElse(Empty)
     }
 }
 
