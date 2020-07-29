@@ -160,12 +160,9 @@ fun main() {
     list2.forEach(condition, printMessage, printDefault)
     list2.forEach(condition, printMessage, printDefault)
 
-    val stream = Stream<Int>()
-        .repeat(::random)
-        .dropAtMost(60000)
-        .takeAtMost(60000)
+    val stream = Stream.from(0).dropAtMost(60000).takeAtMost(60000)
 
-    stream.first().forEach(::println)
+    println(stream.toList())
 }
 
 fun random(): Int {

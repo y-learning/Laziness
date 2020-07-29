@@ -1,6 +1,7 @@
 package laziness
 
 import result.Result
+import lists.List
 
 sealed class Stream<out T> {
 
@@ -16,6 +17,8 @@ sealed class Stream<out T> {
 
     fun <T> repeat(f: () -> T): Stream<T> =
         Cons(Lazy { f() }, Lazy { repeat(f) })
+
+    fun toList(): List<T> = toList(this)
 
     private object Empty : Stream<Nothing>() {
         override fun first(): Result<Nothing> = Result()
@@ -55,5 +58,15 @@ sealed class Stream<out T> {
             if (stream is Cons && n > 0)
                 dropAtMost(n - 1, stream.tail())
             else stream
+
+        fun <T> toList(stream: Stream<T>): List<T> {
+            tailrec fun <T> toList(stream: Stream<T>, list: List<T>): List<T> =
+                when (stream) {
+                    Empty -> list
+                    is Cons -> toList(stream.tail(), list.cons(stream.head()))
+                }
+
+            return toList(stream, List()).reverse()
+        }
     }
 }
