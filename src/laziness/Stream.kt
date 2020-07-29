@@ -15,6 +15,8 @@ sealed class Stream<out T> {
 
     abstract fun takeWhile(p: (T) -> Boolean): Stream<T>
 
+    abstract fun <U> foldRight(acc: Lazy<U>, f: (T) -> (Lazy<U>) -> U): U
+
     fun dropAtMost(n: Int): Stream<T> = dropAtMost(n, this)
 
     fun dropWhile(p: (T) -> Boolean): Stream<T> = dropWhile(this, p)
@@ -36,6 +38,9 @@ sealed class Stream<out T> {
         override fun takeAtMost(n: Int): Stream<Nothing> = this
 
         override fun takeWhile(p: (Nothing) -> Boolean): Stream<Nothing> = this
+
+        override fun <U> foldRight(acc: Lazy<U>,
+                                   f: (Nothing) -> (Lazy<U>) -> U): U = acc()
     }
 
     private data class Cons<T>(val head: Lazy<T>, val tail: Lazy<Stream<T>>)
@@ -56,6 +61,9 @@ sealed class Stream<out T> {
             p(head()) -> Cons(head, Lazy { tail().takeWhile(p) })
             else -> Empty
         }
+
+        override fun <U> foldRight(acc: Lazy<U>, f: (T) -> (Lazy<U>) -> U): U =
+            f(head())(Lazy { tail().foldRight(acc, f) })
     }
 
     companion object {
