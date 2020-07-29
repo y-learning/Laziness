@@ -24,6 +24,8 @@ sealed class Stream<out T> {
 
     fun toList(): List<T> = toList(this)
 
+    fun exists(p: (T) -> Boolean): Boolean = exists(this, p)
+
     private object Empty : Stream<Nothing>() {
         override fun first(): Result<Nothing> = Result()
 
@@ -91,5 +93,14 @@ sealed class Stream<out T> {
             Cons(seed, Lazy { iterate(f(seed()), f) })
 
         fun from(i: Int): Stream<Int> = iterate(i) { it + 1 }
+
+        tailrec fun <T> exists(stream: Stream<T>, p: (T) -> Boolean): Boolean =
+            when (stream) {
+                Empty -> false
+                is Cons -> when {
+                    p(stream.head()) -> true
+                    else -> exists(stream.tail(), p)
+                }
+            }
     }
 }
