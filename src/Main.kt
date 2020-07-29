@@ -1,7 +1,7 @@
 import laziness.Lazy
 import laziness.Stream
 import lists.List
-import kotlin.random.Random
+import java.util.*
 
 fun or(a: Lazy<Boolean>, b: Lazy<Boolean>): Boolean = if (a()) true else b()
 
@@ -160,12 +160,16 @@ fun main() {
     list2.forEach(condition, printMessage, printDefault)
     list2.forEach(condition, printMessage, printDefault)
 
-    val stream = Stream.from(1)
-    stream.first().forEach({ println(it) })
-    stream.rest()
-        .flatMap { seq -> seq.first() }
-        .forEach({ println(it) })
-    stream.rest()
-        .flatMap { seq -> seq.rest().flatMap { it.first() } }
-        .forEach({ println(it) })
+    val stream = Stream<Int>()
+        .repeat(::random)
+        .dropAtMost(60000)
+        .takeAtMost(60000)
+
+    stream.first().forEach(::println)
+}
+
+fun random(): Int {
+    val rnd = Random().nextInt()
+    println("Evaluating $rnd")
+    return rnd
 }
