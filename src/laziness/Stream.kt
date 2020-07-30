@@ -48,13 +48,14 @@ sealed class Stream<out T> {
         }
     }
 
-    fun filter(p: (T) -> Boolean): Stream<T> =
-        foldRight(Lazy<Stream<T>> { Empty }) { e: T ->
-            { acc: Lazy<Stream<T>> ->
-                if (p(e)) Cons(Lazy { e }, acc)
-                else acc()
-            }
+    fun filter(p: (T) -> Boolean): Stream<T> = dropWhile { x ->
+        !p(x)
+    }.let { stream: Stream<T> ->
+        when (stream) {
+            Empty -> stream
+            is Cons -> cons(stream.head, Lazy { stream.tail().filter(p) })
         }
+    }
 
     fun append(stream2: Lazy<Stream<@UnsafeVariance T>>): Stream<T> =
         foldRight(stream2) { e: T ->
